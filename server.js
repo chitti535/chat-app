@@ -9,7 +9,7 @@ let socketIO = require('socket.io');
 let io = socketIO(server);
 
 const port = process.env.port || 3000;
-app.use(express.static(__dirname + '/dist/chart-app'));
+app.use(express.static(__dirname + '/dist/chat-app'));
 
 server.listen(port, () => {
   console.log(`started on port: ${port}`);
