@@ -7,7 +7,8 @@ import { Subject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ChartService {
-  private url = 'http://localhost:3000';
+  private port = process.env.port || 3000;
+  private url = `https://node-chat-api.glitch.me:${this.port}`;
   private socket;
   private subject = new Subject<any>();
   private chattersSubject = new Subject<any>();

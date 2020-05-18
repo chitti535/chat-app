@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "chart-app": {
+    "chat-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
