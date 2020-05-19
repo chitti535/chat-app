@@ -2,11 +2,12 @@
 const path = require('path');
 let express = require('express');
 let app = express();
+
 let http = require('http');
-let server = http.createServer(app);
+let server = http.Server(app);
 
 let socketIO = require('socket.io');
-let io = socketIO(server);
+let io = socketIO().listen(server);
 
 const port = process.env.PORT || 3000;
 app.use(express.static(__dirname + '/dist/chat-app'));
@@ -27,7 +28,7 @@ io.on('connection', (client) => {
     messages.forEach(message => {
       client.emit('message', message.name + ' : ' + message.data);
     });
-    console.log('join...' + name);
+     console.log('join...'+ name);
 
     client.broadcast.emit('add chatter', name);
     chatters.forEach(chatter => {

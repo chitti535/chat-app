@@ -1,4 +1,5 @@
-import * as io from 'socket.io-client';
+// import * as io from 'socket.io-client';
+import * as io from '../../../../src/socket.io.js';
 
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
@@ -8,13 +9,16 @@ import { Subject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ChatService {
+  // private port = 3000;
+  private url = 'https://node-chat-api.glitch.me/';
+  // private url = `http://localhost:${ this.port}`;
   private socket;
   private subject = new Subject<any>();
   private chattersSubject = new Subject<any>();
   private chattersRemoveSubject = new Subject<any>();
 
   constructor() {
-    this.socket = io();
+    this.socket = io(this.url);
 
     this.socket.on('connect', (data) => {
       const nickName = prompt('What is your name');
