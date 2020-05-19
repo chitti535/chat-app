@@ -1,14 +1,14 @@
+
 const path = require('path');
 let express = require('express');
 let app = express();
-
 let http = require('http');
-let server = http.Server(app);
+let server = http.createServer(app);
 
 let socketIO = require('socket.io');
 let io = socketIO(server);
 
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 app.use(express.static(__dirname + '/dist/chat-app'));
 
 server.listen(port, () => {
@@ -27,6 +27,7 @@ io.on('connection', (client) => {
     messages.forEach(message => {
       client.emit('message', message.name + ' : ' + message.data);
     });
+    console.log('join...' + name);
 
     client.broadcast.emit('add chatter', name);
     chatters.forEach(chatter => {
@@ -66,5 +67,6 @@ var storeMessages = function (name, data) {
     messages.shift();
   }
 }
+
 
 

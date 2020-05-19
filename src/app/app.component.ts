@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./app.component.scss']
 })
 
-export class AppComponent implements OnDestroy {
+export class AppComponent {
   title = 'chart-app';
   message = '';
   messages: any[] = [];
@@ -19,44 +19,44 @@ export class AppComponent implements OnDestroy {
   chattersSubscription: Subscription;
   chattersRemoveSubscription: Subscription;
 
-  constructor(private chartService: ChartService) {
+  // constructor(private chartService: ChartService) {
 
-    this.subscription = this.chartService.get().subscribe(message => {
-      if (message) {
-        this.messages.push(message);
-      } else {
-        // clear messages when empty message received
-        this.messages = [];
-      }
-    });
+  //   this.subscription = this.chartService.get().subscribe(message => {
+  //     if (message) {
+  //       this.messages.push(message);
+  //     } else {
+  //       // clear messages when empty message received
+  //       this.messages = [];
+  //     }
+  //   });
 
-    this.chattersSubscription = this.chartService.addChatter().subscribe(chatter => {
-      if (chatter) {
-        this.chatters.push(chatter.name);
-      }
-    });
+  //   this.chattersSubscription = this.chartService.addChatter().subscribe(chatter => {
+  //     if (chatter) {
+  //       this.chatters.push(chatter.name);
+  //     }
+  //   });
 
-    this.chattersRemoveSubscription = this.chartService.removeChatter().subscribe(chatter => {
-      if (chatter) {
-        const index = this.chatters.indexOf(chatter.name);
-        if (index > -1) {
-          this.chatters.splice(index, 1);
-        }
-      }
-    });
+  //   this.chattersRemoveSubscription = this.chartService.removeChatter().subscribe(chatter => {
+  //     if (chatter) {
+  //       const index = this.chatters.indexOf(chatter.name);
+  //       if (index > -1) {
+  //         this.chatters.splice(index, 1);
+  //       }
+  //     }
+  //   });
 
-  }
+  // }
 
-  onSendMessage() {
-    this.chartService.send(this.message);
-  }
+  // onSendMessage() {
+  //   this.chartService.send(this.message);
+  // }
 
-  onClickCharter(charter) {
+  // onClickCharter(charter) {
 
-  }
+  // }
 
-  ngOnDestroy() {
-    // unsubscribe to ensure no memory leaks
-    this.subscription.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   // unsubscribe to ensure no memory leaks
+  //   this.subscription.unsubscribe();
+  // }
 }

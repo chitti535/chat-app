@@ -2,14 +2,12 @@ import * as io from 'socket.io-client';
 
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
+// import { url } from 'inspector';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChartService {
-  // private port =  3000;
-  // private url = `https://node-chat-api.glitch.me`;
-  // private url = `http://localhost:${ this.port}`;
+export class ChatService {
   private socket;
   private subject = new Subject<any>();
   private chattersSubject = new Subject<any>();
