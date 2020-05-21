@@ -25,48 +25,61 @@ io.on('connection', (client) => {
 
   client.on('join', (name) => {
     client.nickName = name;
-    messages.forEach(message => {
-      client.emit('message', message.name + ' : ' + message.data);
-    });
-     console.log('join...'+ name);
+    var id = client.id;
 
-    client.broadcast.emit('add chatter', name);
+    client.emit('joined', {id: id, name: name}); //current user
+
+    messages.forEach(message => {
+      client.emit('message', message);
+    });
+     console.log('join...'+ id +", "+ name);
+
+    client.broadcast.emit('add chatter', {id: id, name: name});
     chatters.forEach(chatter => {
       client.emit('add chatter', chatter);
     });
-    chatters.push(name);
-
-    // redisClient.lrange("messages", 0, -1, (err, messages) => {
-    //   messages = messages.reverse();
-    //   messages.forEach(message => {
-    //     client.emit('message', message.name + ' : ' + message.data);
-    //   });
-    // });
+    chatters.push({id: id, name: name});
+    client.broadcast.emit("allusers", chatters);
+    client.emit("allusers", chatters);
+    console.log(chatters.length);
   });
 
-  client.on('messages', (data) => {
-    var nickName = client.nickName;
-    client.broadcast.emit('message', nickName + ' : ' + data);
-    client.emit('message', nickName + ' (me) : ' + data);
-    storeMessages(nickName, data);
+  client.on('message', (data) => {
+    console.log("sending msg.." + data);
+    var id = client.id;
+    var name = client.nickName;
+    client.broadcast.emit('message', {id: id, name: name, data: data});
+    client.emit('message', {id: id, name: name, data: data});
+    storeMessages(id, name, data);
   });
 
   client.on('disconnect', (data) => {
-    var nickName = client.nickName;
-    client.broadcast.emit('remove chatter', nickName);
+    var id = client.id;
+    var name = client.nickName;
+    client.broadcast.emit('remove chatter', {id: id, name: name});
+    console.log('disconnected...'+ id +", "+ name);
+    removeChatter(id);
+    client.broadcast.emit("allusers", chatters);
+    client.emit("allusers", chatters);
   });
 });
 
-var storeMessages = function (name, data) {
-  // var message = JSON.stringify({ name: name, data: data });
-  // redisClient.lpush("messages", message, (err, response) => {
-  //   redisClient.ltrim("messages", 0, 9);
-  // });
-
-  messages.push({ name: name, data: data });
+var storeMessages = function (id, name, data) {
+  messages.push({ id: id, name: name, data: data });
   if (messages.length > 10) {
     messages.shift();
   }
+}
+
+var removeChatter = function (id) {
+  chatter = chatters.find(x => x.id == id);
+  if (chatter) {
+    const index = chatters.indexOf(chatter);
+    if (index > -1) {
+      chatters.splice(index, 1);
+    }
+  }
+  console.log(chatters.length);
 }
 
 

@@ -5,7 +5,10 @@
 
     <mat-nav-list>
       <mat-list-item *ngFor="let user of chatters">
-         <a matLine href="#">{{ user }}</a>
+         <a matLine [routerLink]="['/contactmanager', user.id]">
+           <mat-icon svgIcon="svg-1"></mat-icon>
+           {{ user.name }}
+          </a>
       </mat-list-item>
     </mat-nav-list>
 

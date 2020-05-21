@@ -1,3 +1,18 @@
-<mat-card>
-  <h1>Main Content</h1>
+<mat-card *ngIf="userTo != null">
+  <h4><span>Messages - {{userTo.name}}</span></h4>
+
+  <span *ngFor="let item of messages" style="width: 100%;">
+    <p [ngClass]="{'message-right': item.isFrom === true, 'message-left': true}">
+      <mat-label >{{item.data}} ({{ item.isFrom === true ? 'me' : item.name }})</mat-label>
+    </p>
+  </span>
+
+  <br>
+  <mat-form-field style="width: 100%;" out>
+    <mat-label>Message</mat-label>
+    <textarea [(ngModel)]="message" matInput placeholder=""></textarea>
+  </mat-form-field>
+  <button mat-mini-fab color="primary" (click)="sendMessage()">
+    <mat-icon>send</mat-icon>
+  </button>
 </mat-card>

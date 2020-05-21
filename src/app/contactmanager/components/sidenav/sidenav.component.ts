@@ -1,6 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ChatService } from '../../services/chat.service';
+import { User } from '../../models/user';
+import { Router } from '@angular/router';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+
 
 const SMALL_WIDTH_BREAKPOINT = 720;
 @Component({
@@ -8,42 +12,48 @@ const SMALL_WIDTH_BREAKPOINT = 720;
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss']
 })
-export class SidenavComponent implements OnInit, OnDestroy {
+export class SidenavComponent implements OnInit, OnDestroy, AfterViewInit {
+  @ViewChild('sidenav', { static: false }) sideNav: MatSidenav;
 
-private mediaMatcher: MediaQueryList = matchMedia(`(max-width: ${SMALL_WIDTH_BREAKPOINT}px`);
-  chatters: any[] = [];
+
+  private mediaMatcher: MediaQueryList = matchMedia(`(max-width: ${SMALL_WIDTH_BREAKPOINT}px`);
+  chatters: User[] = [];
 
   chattersSubscription: Subscription;
-  chattersRemoveSubscription: Subscription;
+  // chattersSubscription: Subscription;
+  // chattersRemoveSubscription: Subscription;
 
-  constructor(private chatService: ChatService) {
-    this.chattersSubscription = this.chatService.addChatter().subscribe(chatter => {
-      if (chatter) {
-        this.chatters.push(chatter.name);
+  constructor(
+    private chatService: ChatService,
+    private router: Router) {
+    this.chattersSubscription = this.chatService.getUsers().subscribe(chatters => {
+      if (chatters) {
+        this.chatters = chatters;
       }
     });
 
-    this.chattersRemoveSubscription = this.chatService.removeChatter().subscribe(chatter => {
-      if (chatter) {
-        const index = this.chatters.indexOf(chatter.name);
-        if (index > -1) {
-          this.chatters.splice(index, 1);
-        }
-      }
-    });
-
-   }
+  }
 
   ngOnInit() {
+
   }
 
   isScreenSmall() {
     return this.mediaMatcher.matches;
   }
 
+  ngAfterViewInit() {
+    this.router.events.subscribe(() => {
+      if (this.isScreenSmall()) {
+        console.log(this.sideNav);
+        this.sideNav.close();
+      }
+    });
+  }
+
   ngOnDestroy() {
     // unsubscribe to ensure no memory leaks
-    // this.subscription.unsubscribe();
+    this.chattersSubscription.unsubscribe();
   }
 
 }
