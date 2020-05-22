@@ -16,7 +16,7 @@ export class ChatService {
   // private url = `http://localhost:${ this.port}`;
 
   private socket;
-  private messageSubject = new Subject<Message>();
+  private messageRecievedSubject = new Subject<Message>();
   private chatterSubject = new Subject<User>();
   private chatterRemoveSubject = new Subject<User>();
   private chattersSubject = new Subject<User[]>();
@@ -41,8 +41,10 @@ export class ChatService {
     });
 
     this.socket.on('message', (msg) => {
-      console.log('msg recieved' + msg);
-      this.messageSubject.next(new Message(msg.id, msg.name, msg.data));
+      console.log('msg recieved' + msg.id + ',' + msg.name + ',' + msg.data);
+      const meesage: Message = new Message(msg.id, msg.name, msg.data);
+      debugger
+      this.messageRecievedSubject.next(meesage);
     });
 
     this.socket.on('add chatter', (data) => {
@@ -75,7 +77,7 @@ export class ChatService {
   }
 
   get(): Observable<Message> {
-    return this.messageSubject.asObservable();
+    return this.messageRecievedSubject.asObservable();
   }
 
   getUsers(): Observable<User[]> {

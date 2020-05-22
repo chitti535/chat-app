@@ -1,5 +1,5 @@
-<mat-card *ngIf="userTo != null">
-  <h4><span>Messages - {{userTo.name}}</span></h4>
+<mat-card>
+  <h4><span></span></h4>
 
   <span *ngFor="let item of messages" style="width: 100%;">
     <p [ngClass]="{'message-right': item.isFrom === true, 'message-left': true}">
@@ -16,3 +16,11 @@
     <mat-icon>send</mat-icon>
   </button>
 </mat-card>
+
+<!-- <mat-card>
+  <div class="container">
+    <video src="" id="video" style="width:700px; height: 350px;" autoplay="true"></video>
+    <canvas style="display:none;" id="preview"></canvas>
+    <div [(ngModel)]="loggerMsg"></div>
+  </div>
+</mat-card> -->

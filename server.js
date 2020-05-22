@@ -51,6 +51,7 @@ io.on('connection', (client) => {
     client.broadcast.emit('message', {id: id, name: name, data: data});
     client.emit('message', {id: id, name: name, data: data});
     storeMessages(id, name, data);
+    console.log('messages length: ' + messages.length);
   });
 
   client.on('disconnect', (data) => {
@@ -62,6 +63,13 @@ io.on('connection', (client) => {
     client.broadcast.emit("allusers", chatters);
     client.emit("allusers", chatters);
   });
+
+
+  // ///Stream related
+  // client.on('stream', function (image) {
+  //   client.broadcast.emit('stream', image);
+  // });
+  // ///Stream related end
 });
 
 var storeMessages = function (id, name, data) {
