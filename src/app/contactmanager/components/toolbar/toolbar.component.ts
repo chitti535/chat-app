@@ -1,4 +1,6 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { User } from '../../models/user';
+import { ChatService } from '../../services/chat.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -8,7 +10,13 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 export class ToolbarComponent implements OnInit {
 
   @Output() toggleSidenav = new EventEmitter<void>();
-  constructor() { }
+  activeUser: User;
+  constructor(private chatService: ChatService) {
+
+    this.chatService.getActiveUser().subscribe(user => {
+      this.activeUser = user;
+    });
+  }
 
   ngOnInit() {
   }

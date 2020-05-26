@@ -4,5 +4,6 @@
       menu
     </mat-icon>
   </button>
-  <span>Messages</span>
+  <span *ngIf="activeUser == null"></span>
+  <span *ngIf="activeUser != null">{{activeUser.name}}</span>
 </mat-toolbar>
