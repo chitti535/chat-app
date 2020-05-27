@@ -226,11 +226,12 @@ export class ChatService {
       console.log( this.socketId + ' -- Excluding Me -- Consider -- ' + peerId);
       const peer: Instance = new SimplePeer({
         initiator: true,
+        reconnectTimer: 3000,
         trickle: false,
         config: {
           iceServers: this.videoChatService.myIceServers
         },
-        // stream: this.stream
+        stream: this.stream
       });
 
       peer.on('signal', signal => {
@@ -242,15 +243,15 @@ export class ChatService {
       peer.on('stream', stream => {
         console.log('streaming in caller');
         this.otherUserVideo.srcObject = stream;
-        this.otherUserVideo.play();
+        // this.otherUserVideo.play();
       });
 
       peer.on('connect', () => {
         console.log('CONNECT Caller');
         peer.send('test values ........... from caller to callee');
-        peer.addStream(this.stream);
+        // peer.addStream(this.stream);
         this.myVideo.srcObject = this.stream;
-        this.myVideo.play();
+        // this.myVideo.play();
         // this.videoChatService.getMediaStream()
         //   .then((stream) => {
         //     peer.addStream(stream);
@@ -273,11 +274,12 @@ export class ChatService {
     console.log( this.socketId + ' -- Initiallize calle -- ' + msg.calleeId);
     const peer: Instance = new SimplePeer({
       initiator: false,
+      reconnectTimer: 3000,
       trickle: false,
       config: {
         iceServers: this.videoChatService.myIceServers
       },
-      // stream: this.stream
+      stream: this.stream
     });
 
     peer.on('signal', signal => {
@@ -288,15 +290,15 @@ export class ChatService {
     peer.on('stream', stream => {
       console.log('streaming in callee');
       this.otherUserVideo.srcObject = stream;
-      this.otherUserVideo.play();
+      // this.otherUserVideo.play();
     });
 
     peer.on('connect', () => {
-      console.log('CONNECT Caller');
+      console.log('CONNECT Callee');
       peer.send('test data ........ from callee to caller');
-      peer.addStream(this.stream);
+      // peer.addStream(this.stream);
       this.myVideo.srcObject = this.stream;
-      this.myVideo.play();
+      // this.myVideo.play();
 
       // this.videoChatService.getMediaStream()
       //   .then((stream) => {

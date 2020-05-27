@@ -27,8 +27,14 @@ export class VideoChatService {
 
   getMediaStream(): Promise<MediaStream> {
     const videoConstraints = { video: true, audio: true };
+    const browser = navigator as any;
+    browser.getUserMedia = (browser.getUserMedia ||
+      browser.webkitGetUserMedia ||
+      browser.mozGetUserMedia ||
+      browser.msGetUserMedia);
+
     return new Promise<MediaStream>((resolve, reject) => {
-      return navigator.mediaDevices.
+      return browser.mediaDevices.
         getUserMedia(videoConstraints)
         .then(stream => {
           return resolve(stream);
