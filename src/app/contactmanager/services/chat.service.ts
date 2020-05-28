@@ -153,11 +153,12 @@ export class ChatService {
   }
 
   onRoomParticipants(fn: (participants: Array<string>) => void) {
-    console.log('client side room users request..');
+    console.log('Client side room users request..');
     this.listen('room_users', fn);
   }
 
   sendOfferSignal(msg: SignalMessage) {
+    console.log('Caller Send Affer Signal to Server ... STEP 3');
     this.send('offer_signal', msg);
   }
 
@@ -166,12 +167,12 @@ export class ChatService {
   }
 
   sendAnswerSignal(msg: SignalMessage) {
-    console.log('client side  answer_signal..' + JSON.stringify(msg));
+    console.log('Callee Send Answer to Server ... STEP 7');
     this.send('answer_signal', msg);
   }
 
   onAnswer(fn: (msg: SignalMessage) => void) {
-    console.log('client side answer..');
+    console.log('Callee Recieve Answer to Server ... STEP 8');
     this.listen('answer', fn);
   }
 
@@ -180,6 +181,7 @@ export class ChatService {
   }
 
   initializeHandlers(stream: MediaStream,  myVideo: HTMLVideoElement, otherUserVideo: HTMLVideoElement) {
+    console.log('initializing Handlers...');
     this.myVideo = myVideo;
     this.otherUserVideo = otherUserVideo;
     this.stream = stream;
@@ -191,21 +193,19 @@ export class ChatService {
       this.initilizePeersAsCaller(participants);
     });
 
-    // this.socket.on('room_users', participants => {
-    //   console.log(`${this.socketId} - On Room Participants`);
-    //   console.log(participants);
-    //   this.initilizePeersAsCaller(participants, stream, peerVideos);
-    // });
-
     this.onOffer(msg => {
+      console.log('Callee Recieve Affer Signal from Server ... STEP 4');
       this.initilizePeersAsCallee(msg);
     });
 
     this.onAnswer(msg => {
-      console.log(`${this.socketId} - You got Answer from ${msg.calleeId}`);
-      console.log(`${this.socketId} - data  ${JSON.stringify(msg)}`);
+      console.log('Step 7 -- contnueing in caller to give siganal for the callee anser signal')
+      console.log(`Caller --- ${this.socketId}  got Answer from Callee --- ${msg.calleeId}`);
+      // console.log(`${this.socketId} - data  ${JSON.stringify(msg)}`);
 
-      const mitronPeer = this.mitronPeers.find(mitronPeer => mitronPeer.peerId === msg.calleeId);
+      console.log(`Get Caller Peer (${ msg.callerId}) and Send Signal with Answer.`);
+      const mitronPeer = this.mitronPeers.find(mitronPeer => mitronPeer.peerId === msg.callerId);
+      console.log(`sending answer signal to caller (${mitronPeer.peerId}).`);
       mitronPeer.peer.signal(msg.signalData);
     });
 
@@ -220,28 +220,31 @@ export class ChatService {
   }
 
   initilizePeersAsCaller(participants: Array<string>) {
+    console.log('Initializing Caller... STEP 1');
     const participantsExcludingMe = participants.filter(id => id !== this.socketId);
     participantsExcludingMe.forEach(peerId => {
 
       console.log( this.socketId + ' -- Excluding Me -- Consider -- ' + peerId);
       const peer: Instance = new SimplePeer({
         initiator: true,
-        reconnectTimer: 3000,
+        // reconnectTimer: 3000,
         trickle: false,
         config: {
           iceServers: this.videoChatService.myIceServers
         },
-        stream: this.stream
+        // stream: this.stream
       });
 
       peer.on('signal', signal => {
-        debugger;
-        console.log(`${this.socketId} Caller Send Signal -- ${JSON.stringify(signal)}` );
+        console.log('Caller signal... STEP 2');
+        // raised multiple signals even thpugh the connection established
+
+        console.log(`Caller --- ${this.socketId}  Send Signal To Callee --- ${peerId}`);
         this.sendOfferSignal({ signalData: signal, callerId: this.socketId, calleeId: peerId });
       });
 
       peer.on('stream', stream => {
-        console.log('streaming in caller');
+        console.log('Streaming in caller');
         this.otherUserVideo.srcObject = stream;
         // this.otherUserVideo.play();
       });
@@ -249,7 +252,7 @@ export class ChatService {
       peer.on('connect', () => {
         console.log('CONNECT Caller');
         peer.send('test values ........... from caller to callee');
-        // peer.addStream(this.stream);
+        peer.addStream(this.stream);
         this.myVideo.srcObject = this.stream;
         // this.myVideo.play();
         // this.videoChatService.getMediaStream()
@@ -265,25 +268,28 @@ export class ChatService {
         console.log('got a message from peer: ' + data);
       });
 
-      this.mitronPeers.push({ peerId: peerId, peer: peer });
+      console.log('Caller Peer added to storage ---' +  this.socketId);
+      this.mitronPeers.push({ peerId: this.socketId, peer: peer });
     });
   }
 
   initilizePeersAsCallee(msg: SignalMessage) {
-    console.log(`${this.socketId} You have an offer from ${msg.callerId}`);
+    console.log('STEP 4 call STEP 5');
+    console.log('Callee Initialising --- STEP 5');
     console.log( this.socketId + ' -- Initiallize calle -- ' + msg.calleeId);
     const peer: Instance = new SimplePeer({
       initiator: false,
-      reconnectTimer: 3000,
+      // reconnectTimer: 3000,
       trickle: false,
       config: {
         iceServers: this.videoChatService.myIceServers
       },
-      stream: this.stream
+      // stream: this.stream
     });
 
     peer.on('signal', signal => {
-      console.log(`${this.socketId} Callee Block ${signal}`);
+      console.log('STEP 6 -- onsignal callee');
+      console.log(`Callee on signal -- Sending answer to callee..`);
       this.sendAnswerSignal({ signalData: signal, callerId: msg.callerId, calleeId: msg.calleeId });
     });
 
@@ -296,7 +302,7 @@ export class ChatService {
     peer.on('connect', () => {
       console.log('CONNECT Callee');
       peer.send('test data ........ from callee to caller');
-      // peer.addStream(this.stream);
+      peer.addStream(this.stream);
       this.myVideo.srcObject = this.stream;
       // this.myVideo.play();
 
@@ -313,7 +319,10 @@ export class ChatService {
       console.log('got a message from peer: ' + data);
     });
 
+    console.log(`Callee signal.`);
     peer.signal(msg.signalData);
+
+    console.log(`Callee Peer ${msg.calleeId} added in to storage.`);
     this.mitronPeers.push({ peerId: msg.calleeId, peer: peer });
   }
   // end signalling

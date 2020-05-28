@@ -97,14 +97,14 @@ io.on('connection', (client) => {
   ///Stream related
   client.on('offer_signal', payload => {
     console.log('get offer from :'+ payload.callerId + ' to: '+ payload.calleeId);
-    console.log('emit to :'+ payload.callerId);
+    console.log('emit to :'+ payload.calleeId);
     io.to(payload.calleeId).emit('offer', { signalData: payload.signalData, callerId: payload.callerId, calleeId: payload.calleeId });
   });
 
   client.on('answer_signal', payload => {
     console.log('answer signal back to :'+ payload.callerId + ' from: '+ client.id);
     console.log('emit to :'+ payload.callerId);
-    io.to(payload.callerId).emit('answer', { signalData: payload.signalData, calleeId: client.id });
+    io.to(payload.callerId).emit('answer', { signalData: payload.signalData, callerId: payload.callerId, calleeId: client.id });
   });
 
   client.on('disconnect', () => {
